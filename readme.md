@@ -14,4 +14,6 @@ Run the server by starting app.exe and then from a browser put the url localhost
 
 You are free to use, modify and make the changes that you most need. To recompile the application you must run go64.bat. Match the paths for a correct compilation. In this first version the system uses the 64-bit MSVC compiler.
 
-Enjoy U-Dbu
+Enjoy U-Dbu  
+
+Charly Aubia
