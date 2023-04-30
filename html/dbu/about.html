@@ -1,0 +1,118 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oWeb, hCredentials
+	
+	if ! USessionReady()
+		URedirect( 'login' )
+		retu nil
+	endif	
+	
+	hCredentials := USession( 'credentials' )
+	
+	DEFINE WEB oWeb TITLE 'About' 
+		
+		oWeb:AddCss( "https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap" )
+		
+		HTML oWeb FILE 'dbu/view/menu.html' PARAMS oWeb, 'About', hCredentials			
+		
+		DEFINE FORM o OF oWeb 			
+			o:cSizing  := 'sm'
+			o:lDessign := .f.
+			o:lFluid 	:= .t.
+		
+		
+		
+		HTML o FILE 'dbu/view/crumb.html' PARAMS o, 'About' 
+		
+		HTML o 
+			<style>
+				.myimg img{
+					width: 100%;
+					max-width: 300px;
+				}
+				
+				.mytext {
+					font-size: 18px;
+					font-weight: bold
+					font-family: 'Bruno Ace SC', cursive;
+				}
+  
+				.about {
+					font-size: 20px;
+					font-family: 'Bruno Ace SC', cursive;
+				}
+				
+				.about2 {
+					font-size: 16px;
+					font-family: 'Bruno Ace SC', cursive;
+				}
+
+				.face img{
+					width:150px;					    
+				}
+			
+			</style>
+		
+		ENDTEXT 
+
+		INIT FORM o 
+		
+			ROWGROUP o CLASS 'm-5'
+				
+				COL o GRID 6 
+					IMAGE FILE 'files/images/logo-u-dbu.png' BIGFILE 'files/images/twebuhttpd2.png' ;
+						ALIGN 'center' CLASS 'myimg' GRID 12 OF o				
+				ENDCOL o 
+			
+				COL o GRID 6
+				
+					ROWGROUP o 
+						IMAGE FILE 'files/images/charly.png' ;
+							ALIGN 'center' CLASS 'face' GRID 12 OF o										
+					ENDROW o
+				
+					SAY CLASS 'about' PROMPT 'Charly Aubia Floresvi' ALIGN 'center' GRID 12 OF o
+					SAY CLASS 'about2' PROMPT 'IT Software' ALIGN 'center' GRID 12 OF o
+				
+				ENDCOL o 			
+			
+			ENDROW o 
+			
+			
+			ROWGROUP o CLASS 'm-5' 
+			
+				COL o GRID 12
+				
+					HTML o 
+					<span class="about2">
+This project is the result of these last years looking for the easiest way
+that we can offer a harbour programmer to be able to jump to the web
+<br><br>
+U-Dbu is an example of how you can very easily make this leap with few resources
+since what is sought is that you do not need to be experts in servers like apache,
+great knowledge of the basic languages of the web (html, javascript, css), knowledge
+of protocols, web flows,...
+<br><br>
+Obviously the program has many possibilities and it only pretends to be a
+brushwork that tries to demonstrate various techniques so that you can see how easy it is to
+now it can be to make the leap to the web.
+<br><br>
+It's not just words, compile it yourself, experiment with the new way of working on the web, ;-)
+<br><br>
+I invite you to see the code and understand the new way to create applications for the web. 
+The entire program is available at <a href="https://github.com/carles9000/u-dbu">https://github.com/carles9000/uhttpd2.dbu</a>
+<br><br>
+There is also a site where we can discuss anything about the program and the project. 
+You can access to <a href="https://discord.gg/bq8a9yGMWh">Discord channel</a>
+					</span>
+					ENDTEXT
+
+				ENDCOL o			
+
+			ENDROW o 
+			
+		ENDFORM o
+			
+	INIT WEB oWeb RETURN
+?>

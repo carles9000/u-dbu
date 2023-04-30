@@ -1,0 +1,39 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oWeb, hCredentials
+	LOCAL hCfg 		:= {=>}
+	
+
+	
+	if ! USessionReady()
+		URedirect( 'login' )
+		retu nil
+	endif	
+
+	hCredentials := USession( 'credentials' )	
+	
+	DEFINE WEB oWeb TITLE 'UTDbu' 									
+	
+		HTML oWeb FILE 'dbu/view/menu.html' PARAMS oWeb, 'Main', hCredentials
+		
+		DEFINE FORM o ID 'myform' API 'api_main' OF oWeb 
+			o:lDessign 	:= .f.						
+			o:lFluid 	:= .t.	
+
+		//HTML o FILE 'dbu/view/crumb.html' PARAMS o, 'Main' 			
+		
+		INIT FORM o CLASS 'p-0'	
+
+			//	Example Splash via hash	
+			
+			hCfg[ 'file'  ] := 'files/images/logo-u-dbu.png'
+			hCfg[ 'route' ] := '/'	
+			//hCfg[ 'color' ] := '#7e94a7;'				
+		
+			TEMPLATE oWeb FILE 'tpl\splash_hash.tpl' PARAMS hCfg
+
+		ENDFORM o
+
+	INIT WEB oWeb RETURN
+?>

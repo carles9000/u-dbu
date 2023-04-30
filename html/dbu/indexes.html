@@ -1,0 +1,179 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oWeb, oBrw, aOptions, hCredentials
+
+	LOCAL cCss 			:= 'tabulator_simple.min.css'	//'tabulator_modern.css'
+	LOCAL aData 		:= {;
+		{ 'field' => 'Name'		, 'type' => 'Character', 'len' => 30, 'dec' => 0 },;
+		{ 'field' => 'First'	, 'type' => 'Character', 'len' => 20, 'dec' => 0 },;
+		{ 'field' => 'Age'		, 'type' => 'Numeric'  , 'len' =>  3, 'dec' => 0 },;
+		{ 'field' => 'Hiredate'	, 'type' => 'Date'	   , 'len' =>  8, 'dec' => 0 };
+	}	
+	LOCAL aRepo 		:= AppGetRepo()
+	LOCAL aTypes 		:= { 'Character', 'Numeric', 'Logic', 'Date', 'Memo' }
+	LOCAL aTypesKey 	:= { 'C'        , 'N'      , 'L'    , 'D'   , 'M' }
+	LOCAL hCfg 			:= {=>}
+	
+	if ! USessionReady()
+		URedirect( 'login' )
+		retu nil
+	endif	
+	
+	hCredentials := USession( 'credentials' )
+	
+	DEFINE WEB oWeb TITLE 'Indexes' 
+	
+		oWeb:AddCss( 'https://unpkg.com/tabulator-tables@5.4.3/dist/css/' + cCss )
+		
+		HTML oWeb FILE 'dbu/view/menu.html' PARAMS oWeb, 'Indexes', hCredentials
+
+		DEFINE FORM o ID 'index' API 'api_indexes' OF oWeb 			
+			o:cSizing  := 'sm'
+			o:lDessign := .f.
+		
+		HTML o 
+			<style>
+
+				.myscreen { 					
+					max-width: 600px;
+				}	
+
+			</style>		
+		ENDTEXT
+		
+		HTML o FILE 'dbu/view/crumb.html' PARAMS o, 'Indexes' 
+
+		INIT FORM o 
+			
+			ROW o HALIGN 'center' CLASS 'pt-1' 					
+				
+				
+				COL o GRID 10 CLASS 'myscreen'	
+				
+
+					ROWGROUP o 
+					
+						//	BarMenu with buttons
+						
+							hCfg[ 'left' ]  := {;											
+											{ 'label' => '&nbsp;Select Dbf', 'icon' => '<i class="fa fa-table" aria-hidden="true"></i>', 'action' => 'dlg_select_dbf'  };
+											   } 
+											  
+							hCfg[ 'right' ] := {;
+											{ 'label' => '&nbsp;Build Indexes'   , 'icon' => '<i class="fa fa-cog" aria-hidden="true"></i>', 'action' => 'create_cdx', 'pbs' => 'InitProc' };
+											   } 									  
+						//	This line is a view. Explanations in view. Level advanced
+						
+							HTML o FILE 'dbu/view/mybar.html' PARAMS o, hCfg											
+					
+					ENDROW o 	
+				
+					ROWGROUP o VALIGN 'bottom' 																		
+			
+						GET ID 'repo' VALUE '' LABEL 'Repository'  GRID 4 READONLY OF o
+						GET ID 'file' VALUE '' LABEL 'File'  GRID 8 READONLY OF o												
+						
+					ENDROW o 
+					
+					ROWGROUP o VALIGN 'bottom'
+					
+						GET ID 'tag' VALUE '' LABEL 'Field' GRID 4 OF o												
+						GET ID 'key' VALUE '' LABEL 'Key'   GRID 6 OF o
+						
+						BUTTON LABEL '&nbsp;Add' CLASS 'btn btn-outline-dark' GRID 2 ACTION 'add' ICON '<i class="fa fa-plus" aria-hidden="true"></i>' OF o
+
+					ENDROW o 
+					
+					ROW o   CLASS "pl-3 pr-3"											
+
+							aOptions := { ;
+								'index' => 'name',   		;	// Default id
+								'height' => '300px',		;
+								'layout' => 'fitDataStretch',	;
+								'selectable' => 1, 			;	// Podem posar 1 (sols 1 col)
+								'selectableRollingSelection' => 1,;
+								'selectableRangeMode' => "click"	;								
+							}															
+							
+							DEFINE BROWSE oBrw ID 'brwindexes' OPTIONS aOptions ;
+								CLASS 'w-100' ;
+								TITLE '<h5>Tags</h5>' ALL OF o 
+								
+								//	https://tabulator.info/docs/5.4/columns 
+								//	https://tabulator.info/docs/5.4/select#setup-formatting
+								COL oCol TO oBrw CONFIG { 'formatter' => "rowSelection",  'headerSort' => .F., 'hozAlign' => 'center' }
+							
+								COL oCol TO oBrw CONFIG { 'title' => 'Name'  , 'field' => 'name' }
+								COL oCol TO oBrw CONFIG { 'title' => 'Key'   , 'field' => 'key'  }
+								COL oCol TO oBrw CONFIG { 'title' => 'Status', 'field' => 'status', 'formatter' => '_mystatus', 'hozAlign' => 'center' }
+								
+							INIT BROWSE oBrw 
+			
+					ENDROW o 
+					
+					ROWGROUP o CLASS "pl-3 pr-3"
+					
+						//	Aqui podriamos usar la view de la barra superior, pero para que 
+						//	se pueda ver la diferencia de codigo...y mantenimiento.
+						//
+						//	Here we could use the top bar view, but for what
+						//  you can see the code difference... and maintenance.
+						
+						
+						HTML o INLINE '<div class="mybar pt-1 pb-1">'
+							COL o GRID 12 							
+								HTML o INLINE '<div class="btn-group">' 
+									BUTTON LABEL '&nbsp;Edit' ICON '<i class="fa fa-check" aria-hidden="true"></i>' ACTION 'edit' GRID 0 WIDTH '100px'  CLASS 'btn btn-outline-dark' OF o
+									BUTTON LABEL '&nbsp;Del'  ICON '<i class="fa fa-trash" aria-hidden="true"></i>' ACTION 'del' GRID 0 WIDTH '100px' CLASS 'btn btn-outline-dark'  OF o																		
+								HTML o INLINE '</div>'
+							ENDCOL o
+						HTML o INLINE '</div>'
+						
+					ENDROW o 						
+				
+				ENDCOL o	
+				
+			ENDROW o		
+			
+			
+			HTML o 
+			
+				<script>
+				
+					function InitProc() {	
+
+						var  oBrw = new UTabulator("index-brwindexes");												
+						
+						if ( oBrw.table.getData().length == 0 ) 
+							return null 					
+					
+						if ( !confirm( 'This process can be slow. Continue?') )
+							return false
+					
+						MsgLoading( 'Create indexes...', null, 'fas fa-circle-notch fa-spin')
+					
+						return true
+					}
+					
+					function _mystatus( cell, formatterParams, onRendered ) { 
+					
+						if ( cell.getData().status == 'u' ) 
+							return '<img src="files/images/alert.png" style="width:16px;"></img>'
+						else if ( cell.getData().status == 'r' )
+							return '<img src="files/images/check.png" style="width:16px;"></img>'
+						else if ( cell.getData().status == 'e' )
+							return '<img src="files/images/error.png" style="width:16px;"></img>&nbsp;' + cell.getData().error
+						else
+							return ''
+					}	
+					
+				</script>
+			
+			ENDTEXT 			
+
+		ENDFORM o
+
+	INIT WEB oWeb RETURN
+?>
+

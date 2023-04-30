@@ -1,0 +1,77 @@
+<?prg 
+
+	local oNav
+	LOCAL oWeb			:= pvalue(1)	
+	LOCAL cItem			:= lower(pvalue(2))
+	LOCAL hCredentials 	:= pValue(3)
+	
+	if valtype( hCredentials ) != 'H'
+		hCredentials := {=>}
+		hCredentials[ 'name' ] := ''
+		hCredentials[ 'user' ] := ''
+		hCredentials[ 'profile' ] := ''
+	endif	
+
+	NAV oNav ID 'nav' TITLE '&nbsp;{{ AppVersion() }}' LOGO 'files/images/mini-mercury.png' ;
+		ROUTE 'splash'  WIDTH 30 HEIGHT 30 BURGUERLEFT SIDEBAR OF oWeb
+		
+		MENU GROUP 'General' OF oNav
+		
+
+			MENUITEM '&nbsp;Browse' ICON '<i class="fa fa-table" aria-hidden="true"></i>' ROUTE 'browse' ACTIVE ( cItem == 'browse' ) OF oNav				
+			
+		if hCredentials[ 'profile' ] == 'A'
+			MENU GROUP 'System' OF oNav
+				MENUITEM '&nbsp;Dashboard' ICON '<i class="fa fa-magic" aria-hidden="true"></i>' ROUTE 'dashboard' ACTIVE ( cItem == 'dashboard' ) OF oNav
+				MENUITEM '&nbsp;Structure' ICON '<i class="fa fa-database" aria-hidden="true"></i>' ROUTE 'structure' ACTIVE ( cItem == 'structure' ) OF oNav				
+				MENUITEM '&nbsp;Indexes'   ICON '<i class="fa fa-indent" aria-hidden="true"></i>' ROUTE 'indexes' ACTIVE ( cItem == 'indexes' ) OF oNav				
+				MENUITEM '&nbsp;Server Info' ICON '<i class="fa fa-server" aria-hidden="true"></i>' ROUTE 'server_info' ACTIVE ( cItem == 'server_info' ) OF oNav
+				
+			MENU GROUP 'Config' OF oNav
+				MENUITEM 'Users'      ICON '<i class="fa fa-user" aria-hidden="true"></i>' ROUTE 'users'      ACTIVE ( cItem == 'users' ) OF oNav
+				MENUITEM 'Repository' ICON '<i class="fa fa-folder-open" aria-hidden="true"></i>' ROUTE 'repository' ACTIVE ( cItem == 'repository' ) OF oNav
+				
+		endif
+		
+		
+		MENUITEM SEPARATOR OF oNav
+		MENUITEM 'About' ICON '<i class="fa fa-address-card" aria-hidden="true"></i>' ROUTE 'about' ACTIVE ( cItem == 'about' ) OF oNav 
+		MENUITEM 'Logout' ICON '<i class="fa fa-power-off" aria-hidden="true"></i>' ROUTE 'logout' OF oNav 
+
+		
+		//	Con un poco nativo, puedes combinar los 2 metodos
+		//  With a little native, you can combine the 2 methods
+		
+			HTML SIDEBAR OF oNav PARAMS hCredentials 	
+
+				<style>
+				
+					.profile {
+						margin-left: auto;
+						margin-right: auto;
+						text-align: center;						
+						padding-top: 10px;
+						padding-bottom: 10px;						
+						border-bottom: 1px solid #efefef;				
+					}
+					
+					.profile .name {
+						font-size: 18px;
+						margin-bottom: 0;					
+					}
+					
+					.profile .user {
+						font-size: 14px;
+						color: #cfcfcf;
+					}
+
+				</style>
+				
+				<div class="profile">
+					<h3 class="name"><$ hCredentials[ 'name' ] $></h3>
+					<span class="user"><$ hCredentials[ 'user' ] $></span>
+				</div>		
+			ENDTEXT			
+	
+	RETU ''
+?>

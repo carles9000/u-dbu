@@ -1,0 +1,29 @@
+Welcome to U-Dbu
+================
+
+U-Dbu is an example program whose objective is to show its functionality and
+his way of programming. The scenario here will be the web, one of the jumps that most
+makes it difficult for many of the harbour programmers. After 3 years (COVID confinement)
+in which I participated in the construction of the mods, I saw that few made the jump
+and I didn't understand why, since currently modHarbour is analogous in use to php with the
+same functionalities, but not enough. You have to know also web. All web world:
+flows, languages (html,js,css + jquerys, bootstrap,...), server management,...
+In short, a lot of knowledge.
+
+The use of UT (Uhttpd2+TWeb) creates a layer for most of these concepts and allows us to
+easily create applications like the one I show you here, U-Dbu.
+
+It is a simple application and more features can be added, but most importantly
+is to be able to check the strength that you can have with this system and see how
+build an entire application on the web.
+
+All the code is available, you can modify, delete, delete and even use it in
+your projects.
+
+If you want to participate in the project, create queries, doubts,..., we have a forum in
+https://discord.gg/bq8a9yGMWh
+
+Join us and start experiencing the new UT concept.
+
+Charly Aubia
+

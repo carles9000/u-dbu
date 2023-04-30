@@ -1,0 +1,130 @@
+<?prg 
+
+/*	MYBAR - Config parameters example
+
+
+	hCfg [ 'class' ] := 'pt-1 pb-1'
+	hCfg[ 'left' ] := {;
+		{ 'label' => 'New Dbf'   , 'icon' => '<i class="fa fa-file" aria-hidden="true"></i>', 'action' => 'new_dbf'			, 'class' => 'btn btn-outline-dark', 'confirm' => 'Create new table?' },;
+		{ 'label' => 'Select Dbf', 'icon' => '<i class="fa fa-table" aria-hidden="true"></i>', 'action' => 'dlg_select_dbf'  , 'class' => 'btn btn-outline-dark', 'pbs' => 'InitProc' };
+		  } 
+	hCfg[ 'right' ] := {;
+					{ 'label' => 'Create'   , 'icon' => '<i class="fa fa-table" aria-hidden="true"></i>', 'action' => 'create_dbf'		, 'pbs' => 'InitProc' };
+					   } 		  
+*/
+
+	LOCAL o 	:= pvalue(1)
+	LOCAL hCfg 	:= pvalue(2)
+	
+	LOCAL cClass := 'mybar pt-2 pb-2'
+	
+	if HB_HHasKey( hCfg, 'class' )
+		cClass := 'mybar ' + HB_HGetDef( hCfg, 'class', '' )
+	endif
+
+	
+	HTML o 
+		<style>
+
+			.mybar {				
+				border: 1px solid gray;
+				width:100%;	
+				background-color: #d8d8d8;
+				border-color: darkgray;
+				border-right-color: black;
+				border-bottom-color: black;	
+				box-shadow: 5px 5px 5px gray;					
+			}
+			
+		</style>
+	
+	ENDTEXT	
+	
+
+	HTML o INLINE '<div class="' + cClass + '" >'	
+	
+		COL o GRID 12 
+		
+		
+			if HB_HHasKey( hCfg, 'left' ) .and. len( hCfg[ 'left']) > 0			
+							
+				HTML o INLINE '<div class="btn-group">'					
+
+					for n := 1 to len( hCfg[ 'left'] )
+						
+						h := hCfg[ 'left' ][n]
+					
+						cLabel := HB_HGetDef( h, 'label', '' )
+						cIcon  := HB_HGetDef( h, 'icon', '' )
+						cAction := HB_HGetDef( h, 'action', '' )
+						cClass := HB_HGetDef( h, 'class', 'btn btn-outline-dark' )
+						cConfirm := HB_HGetDef( h, 'confirm', '' )
+						cPBS := HB_HGetDef( h, 'pbs', '' )
+					
+						BUTTON LABEL cLabel ICON cIcon ACTION cAction CLASS cClass ;
+							CONFIRM cConfirm PBS cPbs GRID 0 OF o
+						
+					next 
+				
+				HTML o INLINE '</div>'
+			
+			endif
+			
+			if HB_HHasKey( hCfg, 'right' ) .and. len( hCfg[ 'right']) > 0			
+							
+				HTML o INLINE '<div class="btn-group" style="float:right;">'					
+
+					for n := 1 to len( hCfg[ 'right'] )
+						
+						h := hCfg[ 'right' ][n]
+					
+						cLabel := HB_HGetDef( h, 'label', '' )
+						cIcon  := HB_HGetDef( h, 'icon', '' )
+						cAction := HB_HGetDef( h, 'action', '' )
+						cClass := HB_HGetDef( h, 'class', 'btn btn-outline-dark' )
+						cConfirm := HB_HGetDef( h, 'confirm', '' )
+						cPBS := HB_HGetDef( h, 'pbs', '' )
+					
+						BUTTON LABEL cLabel ICON cIcon ACTION cAction CLASS cClass ;
+							CONFIRM cConfirm PBS cPbs GRID 0 OF o
+						
+					next 
+				
+				HTML o INLINE '</div>'
+			
+			endif			
+		
+			
+		ENDCOL o 
+		
+	HTML o INLINE '</div>'
+
+	RETU ''	
+	
+	/*
+	//	ButtonBar - View
+	//	Toda esta vista realiza algo similar al código siguiente:
+	//  This entire view does something similar to the following code:
+	
+	HTML o INLINE '<div class="mybar pt-2 pb-2 ">'
+		COL o GRID 12 	
+		
+			HTML o INLINE '<div class="btn-group">'						
+				BUTTON LABEL '&nbsp;New Dbf' ICON '<i class="fa fa-file" aria-hidden="true"></i>' ACTION 'new_dbf' CLASS 'btn btn-outline-dark' GRID 0 ;
+					CONFIRM 'Create new table?' OF o
+				BUTTON LABEL '&nbsp;Select Dbf' ICON '<i class="fa fa-table" aria-hidden="true"></i>' ACTION 'dlg_select_dbf' CLASS 'btn btn-outline-dark' GRID 0 OF o									
+			HTML o INLINE '</div>'
+			
+			
+			HTML o INLINE '<div class="btn-group" style="float:right;">'	
+				BUTTON LABEL '&nbsp;Create' ICON '<i class="fa fa-table" aria-hidden="true"></i>' ;
+					PBS 'InitProc' ;
+					ACTION 'create_dbf' GRID 0 CLASS 'btn btn-outline-dark' OF o
+
+			HTML o INLINE '</div>'
+			
+		ENDCOL o 
+		
+	HTML o INLINE '</div>'
+	*/
+?>

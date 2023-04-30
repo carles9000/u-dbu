@@ -1,0 +1,37 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oDlg
+	local aFilter 
+	
+	LOCAL aRepo 	:= pValue(1)
+	LOCAL cRepo 	:= pValue(2)
+	LOCAL cFile 	:= pValue(3)
+
+
+	DEFINE DIALOG oDlg 			
+		
+		DEFINE FORM o ID 'create' API 'api_structure' OF oDlg 			
+		
+		INIT FORM o 
+
+			o:cSizing := 'sm'
+			
+			ROWGROUP o 						
+				SELECT oSelect  ID 'repository' LABEL 'Repository' PROMPT aRepo VALUE cRepo GRID 12  OF o							
+			ENDROW o 	
+
+			ROWGROUP o 						
+				GET ID 'file' LABEL 'File' VALUE cFile GRID 12  OF o							
+			ENDROW o 
+			
+			ROWGROUP o 	HALIGN 'center'								
+				BUTTON LABEL 'Accept' ACTION 'create_dbf' ALIGN 'center' WIDTH '200px'  ;
+					CONFIRM 'Are you sure?' ;
+					GRID 12 OF o 
+			ENDROW o 						
+
+		ENDFORM o
+ 
+	INIT DIALOG oDlg RETURN
+?>

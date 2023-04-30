@@ -1,0 +1,76 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+	LOCAL cCss := 'tabulator_simple.min.css'	//'tabulator_modern.css'
+    LOCAL o, oWeb, oBrw, aOptions, hCredentials, aData, hCfg
+	
+	if ! USessionReady()
+		URedirect( 'login' )
+		retu nil
+	endif	
+	
+	hCredentials := USession( 'credentials' )
+	
+	hCfg := UGetServerInfo() 
+
+	aData := {;
+		{ 'TAG' => 'Path'				, 'VALUE' => hCfg[ 'path' ] },;
+		{ 'TAG' => 'Port'				, 'VALUE' => hCfg[ 'port' ] },;
+		{ 'TAG' => 'Version Harbour'	, 'VALUE' => hCfg[ 'harbour' ] },;
+		{ 'TAG' => 'Version Uhttpd2'	, 'VALUE' => hCfg[ 'version' ] },;
+		{ 'TAG' => 'Version TWeb'		, 'VALUE' => hCfg[ 'version_tweb' ] },;
+		{ 'TAG' => 'OS'					, 'VALUE' => hCfg[ 'os' ] },;
+		{ 'TAG' => 'Build date'			, 'VALUE' => hCfg[ 'builddate' ] },;
+		{ 'TAG' => 'Compiler'			, 'VALUE' => hCfg[ 'compiler' ] },;
+		{ 'TAG' => 'Codepage'			, 'VALUE' => hCfg[ 'codepage' ] },;
+		{ 'TAG' => 'SSL'				, 'VALUE' => if( hCfg[ 'ssl' ], 'Yes', 'No' ) },;
+		{ 'TAG' => 'Start'				, 'VALUE' => hCfg[ 'start' ] },;
+		{ 'TAG' => 'Trace'				, 'VALUE' => if( hCfg[ 'debug' ], 'Yes', 'No' ) },;
+		{ 'TAG' => 'Session path'		, 'VALUE' => hCfg[ 'sessionpath' ] },;
+		{ 'TAG' => 'Session duration'	, 'VALUE' => hCfg[ 'sessionduration' ] },;
+		{ 'TAG' => 'UTF8 saved'			, 'VALUE' => if( hCfg[ 'utf8' ], 'Yes', 'No' ) };
+	}
+		
+
+	DEFINE WEB oWeb TITLE 'Browse' 
+	
+		oWeb:AddCss( 'https://unpkg.com/tabulator-tables@5.4.3/dist/css/' + cCss )
+	
+		HTML oWeb FILE 'dbu/view/menu.html' PARAMS oWeb, 'Server_Info', hCredentials
+		
+		DEFINE FORM o OF oWeb 			
+		
+		HTML o FILE 'dbu/view/crumb.html' PARAMS o, 'Server Info' 				
+		
+		INIT FORM o 					
+			
+			ROW o VALIGN 'top' HALIGN 'center' CLASS 'pt-4' 					
+				
+				COL o GRID 10
+				
+					//	https://tabulator.info/docs/5.4/options
+				
+					aOptions := { ;
+						'height' => '80%',	;
+						'layout' => 'fitDataStretch';												
+					}															
+					
+					DEFINE BROWSE oBrw ID 'mytable' OPTIONS aOptions ;
+						TITLE '<h5><i class="fa fa-server" aria-hidden="true"></i>&nbsp;Server Settings</h5>' OF o 
+						
+						//	https://tabulator.info/docs/5.4/columns 
+						
+						COL oCol TO oBrw CONFIG { 'title' => "Tag", 'field' => "TAG", 'hozAlign' => "right" }
+						COL oCol TO oBrw CONFIG { 'title' => "Value", 'field' => "VALUE" }												
+						
+					INIT BROWSE oBrw DATA aData																				
+			
+				ENDCOL o				
+				
+			ENDROW o		
+
+		ENDFORM o
+
+	INIT WEB oWeb RETURN
+?>
+

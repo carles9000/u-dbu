@@ -1,0 +1,32 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+	LOCAL cFilter := PValue(1)
+    LOCAL o, oDlg, oBrw, aOptions, aFilter , c
+
+	DEFINE DIALOG oDlg 			
+		
+		DEFINE FORM o ID 'sel_filter' API 'api_browse' OF oDlg 			
+		
+		INIT FORM o 
+
+			o:cSizing := 'sm'					
+	
+			
+			ROWGROUP o 									
+				
+				GET MEMO ID 'filter' LABEL 'Filter' VALUE cFilter GRID 12 ROWS 4 OF o
+				
+			ENDROW o	
+			
+			ROWGROUP o 	VALIGN 'bottom' HALIGN 'center'								
+				GET ID 'max_reg' LABEL 'Max. Registers' VALUE '1000' TYPE 'number' GRID 4 OF o
+				BUTTON LABEL '&nbsp;Execute' ACTION 'exe_filter' ALIGN 'center' WIDTH '200px'  CLASS 'btn btn-outline-dark' ;
+					ICON '<i class="fa fa-check" aria-hidden="true"></i>' GRID 8 OF o 
+			ENDROW o 							
+
+		ENDFORM o
+ 
+	INIT DIALOG oDlg RETURN
+?>
+

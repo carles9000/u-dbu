@@ -1,0 +1,130 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oWeb, oBrw, aOptions
+
+	LOCAL cCss 		:= 'tabulator_simple.min.css'	//'tabulator_modern.css'
+	LOCAL hCfg 		:= {=>}
+	LOCAL cTitle 	:= ''
+	LOCAL aTags  	:= {}
+	LOCAL hCredentials
+
+	if ! USessionReady()
+		URedirect( 'login' )
+		retu nil
+	endif	
+	
+	hCredentials := USession( 'credentials' )
+	
+	DEFINE WEB oWeb TITLE 'Browse' 
+	
+		oWeb:AddJs( 'https://oss.sheetjs.com/sheetjs/xlsx.full.min.js' )
+		oWeb:AddCss( 'https://unpkg.com/tabulator-tables@5.4.3/dist/css/' + cCss )
+		
+		HTML oWeb FILE 'dbu/view/menu.html' PARAMS oWeb, 'Browse', hCredentials
+			
+		
+		DEFINE FORM o ID 'browse' API 'api_browse' OF oWeb 			
+			o:cSizing  := 'sm'
+			o:lDessign := .f.
+			o:lFluid 	:= .f.
+		
+		
+		HTML o FILE 'dbu/view/crumb.html' PARAMS o, 'Table browse' 
+
+		INIT FORM o 
+		
+			GET ID 'tabletoken' HIDDEN VALUE '' OF o
+			
+			ROW o HALIGN 'center' CLASS 'pt-1' 									
+				
+				COL o GRID 12 		
+
+					ROWGROUP o 
+					
+						//	BarMenu with buttons
+						
+							hCfg[ 'left' ]  := {;											
+											{ 'label' => '&nbsp;Select Dbf', 'icon' => '<i class="fa fa-table" aria-hidden="true"></i>', 'action' => 'dlg_select_dbf' },;
+											{ 'label' => '&nbsp;Refresh page', 'icon' => '<i class="fa fa-retweet" aria-hidden="true"></i>', 'action' => 'refresh' },;
+											{ 'label' => '&nbsp;Info Table', 'icon' => '<i class="fa fa-info-circle" aria-hidden="true"></i>', 'action' => 'info' },;
+											{ 'label' => '&nbsp;Print', 'icon' => '<i class="fa fa-print" aria-hidden="true"></i>', 'action' => 'print' },;
+											{ 'label' => '&nbsp;Download', 'icon' => '<i class="fa fa-download" aria-hidden="true"></i>', 'action' => 'to_xls' };
+											   } 
+											  
+							hCfg[ 'right' ] := {;
+											{ 'label' => '&nbsp;Close', 'icon' => '<i class="fa fa-window-close" aria-hidden="true"></i>', 'action' => 'close' };											
+											   } 									  
+						//	This line is a view. Explanations in view. Level advanced
+						
+							HTML o FILE 'dbu/view/mybar.html' PARAMS o, hCfg											
+					
+					ENDROW o 	
+
+
+					ROWGROUP o ID 'header' HIDDEN //VALIGN 'bottom' 
+
+						SAY ID 'header_file' LABEL '<h5>Browse</h5><hr>' ALIGN 'center' GRID 12  OF o		
+						
+						ROW o  VALIGN 'bottom' CLASS 'w-100 ml-0 mr-0' 
+						  SELECT ID 'bag' LABEL 'Index' PROMPT aTags ONCHANGE 'new_ordername' GRID 4 OF o
+						  GET oSelect  ID 'recno' LABEL 'Go to recno' BUTTON '<i class="fa fa-search" aria-hidden="true"></i>&nbspGo' ACTION 'goto' GRID 3 OF o				
+						  SWITCH ID 'deleted' VALUE .F. LABEL 'Set Deleted' ONCHANGE 'setdeleted' GRID 3 OF o
+						  BUTTON LABEL '&nbsp;Filter' ACTION 'dlg_filter' CLASS 'btn btn-outline-dark' width '100px' ;
+							ICON '<i class="fa fa-filter" aria-hidden="true"></i>' GRID 2 OF o
+						ENDROW o	
+						
+					ENDROW o 
+					
+					ROW o   CLASS "pl-3 pr-3"											
+
+							aOptions := { ;
+								'index' => '_recno',   		;		// Default id
+								'height' => '400px',		;							
+								'selectable' => 1, 			;		// Podem posar 1 (sols 1 col)
+								'selectableRollingSelection' => 1,;
+								'selectableRangeMode' => "click"	;								
+							}															
+							
+						aOptions := { ;
+							'height' => '300px',	;					
+							'index' => '_recno' 		;		// Default id
+						}																					
+												
+						DEFINE BROWSE oBrw ID 'brwdata' CLASS 'w-100'  OF o 
+						INIT BROWSE oBrw
+			
+					ENDROW o 
+					
+					ROWGROUP o ID 'brwbar' CLASS "pl-3 pr-3" HIDDEN
+
+						HTML o INLINE '<div class="mybar pt-1 pb-1">'
+							COL o GRID 12 							
+								HTML o INLINE '<div class="btn-group">' 									
+									BUTTON LABEL '&nbsp;New'  ICON '<i class="fa fa-plus" aria-hidden="true"></i>' ACTION 'new' GRID 0 WIDTH '100px' CLASS 'btn btn-outline-dark'  OF o
+									BUTTON LABEL '&nbsp;Del'  ICON '<i class="fa fa-trash" aria-hidden="true"></i>' ACTION 'del' GRID 0 WIDTH '100px' CLASS 'btn btn-outline-dark'  OF o																						
+								HTML o INLINE '</div>'
+								
+								
+								HTML o INLINE '<div class="btn-group" style="float:right;">' 									
+									SAY ID 'info' VALUE '' GRID 0 CLASS 'p-1 pr-3' OF o
+									BUTTON ID 'btn_top'  ACTION 'top' GRID 0 WIDTH '50px' CLASS 'btn btn-outline-dark'  ICON '<i class="fa fa-step-backward" aria-hidden="true"></i>' OF o
+									BUTTON ID 'btn_prev' ACTION 'prev' GRID 0 WIDTH '50px' CLASS 'btn btn-outline-dark'  ICON '<i class="fa fa-backward" aria-hidden="true"></i>' OF o
+									GET ID 'page' VALUE '' GRID 0 STYLE 'width:70px;' ALIGN 'center' READONLY OF o
+									BUTTON ID 'btn_next' ACTION 'next' GRID 0 WIDTH '50px' CLASS 'btn btn-outline-dark' ICON '<i class="fa fa-forward" aria-hidden="true"></i>' OF o
+									BUTTON ID 'btn_end'  ACTION 'end' GRID 0 WIDTH '50px' CLASS 'btn btn-outline-dark' ICON '<i class="fa fa-fast-forward" aria-hidden="true"></i>'  OF o
+								HTML o INLINE '</div>'								
+							ENDCOL o
+						HTML o INLINE '</div>'
+						
+					ENDROW o 							
+				
+				ENDCOL o	
+				
+			ENDROW o			
+
+		ENDFORM o
+
+	INIT WEB oWeb RETURN
+?>
+

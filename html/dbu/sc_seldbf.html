@@ -1,0 +1,103 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oDlg, oBrw, aOptions
+	local aFilter 
+	local aCodePage 	:= {}
+	local aCodePage_Key := {}
+
+	LOCAL aRepo 	:= AppGetRepo()
+	LOCAL hParam 	:= pValue(1)		
+    LOCAL cdp
+	
+    FOR EACH cdp IN get_list_of_real_codepages()      
+		Aadd( aCodePage		, cdp + ' - ' +  hb_cdpUniID( cdp ))
+		Aadd( aCodePage_Key	, hb_cdpUniID( cdp ) )
+    NEXT    	
+	
+	//	Validate param 
+	
+	if valtype( hParam ) != 'H' 
+	
+		if	! HB_HHasKey( hParam, 'action' )			
+			retu 'Error parameters...' 
+		endif
+		
+		if	! HB_HHasKey( hParam, 'codepage' )			
+			hParam[ 'codepage' ] := .f. 
+		endif
+		
+	endif
+	
+	//	------------------
+	
+
+	DEFINE DIALOG oDlg 			
+		
+		DEFINE FORM o ID 'select_dbf' API 'api_select_dbf' OF oDlg 			
+		
+		INIT FORM o 
+
+			o:cSizing := 'sm'
+			
+			ROWGROUP o 	VALIGN 'bottom'				
+			
+				if hParam[ 'codepage' ]
+					SELECT oSelect  ID 'repository' LABEL 'Repository' PROMPT aRepo GRID 6 ONCHANGE 'load_repo' OF o				
+					SELECT ID 'codepage' LABEL 'Collate' PROMPT aCodepage VALUES aCodepage_Key VALUE 'cp1252' GRID 6 OF o				
+				else
+					SELECT oSelect  ID 'repository' LABEL 'Repository' PROMPT aRepo GRID 12  ONCHANGE 'load_repo' OF o				
+				endif
+			
+			ENDROW o 												
+			
+			ROWGROUP o 					
+				
+				COL o GRID 12
+				
+					//	https://tabulator.info/docs/5.4/options
+				
+					aOptions := { ;
+						'height' => '280px',				;					
+						'index' => 'file', 					;	// Default id
+						'layout' => 'fitDataStretch',		;
+						'selectable' => 1, 					;	// Podem posar 1 (sols 1 col)						
+						'selectableRollingSelection' => .T. ;
+					}											
+					
+					
+					DEFINE BROWSE oBrw ID 'brwdbf' OPTIONS aOptions ;
+						TITLE '<h5>Dbf list</h5>' OF o 					
+						
+						//	https://tabulator.info/docs/5.4/columns 
+						//	https://tabulator.info/docs/5.4/select#setup-formatting
+						COL oCol TO oBrw CONFIG { 'formatter' => "rowSelection", 'align' => "center", 'headerSort' => .F. }
+												
+						COL oCol TO oBrw CONFIG { 'title' => "File", 'field' => "file" }
+						COL oCol TO oBrw CONFIG { 'title' => "Size", 'field' => "size", 'hozAlign' => "right", 'headerHozAlign' => 'center'}						
+						
+					INIT BROWSE oBrw 																		
+			
+				ENDCOL o				
+				
+			ENDROW o
+			
+			ROWGROUP o 	HALIGN 'center'								
+				BUTTON LABEL '&nbsp;Select' ACTION hParam[ 'action' ] ALIGN 'center' WIDTH '200px'  CLASS 'btn btn-outline-dark' ;
+					ICON '<i class="fa fa-check" aria-hidden="true"></i>' GRID 12 OF o 
+			ENDROW o 							
+
+		ENDFORM o
+ 
+	INIT DIALOG oDlg RETURN
+	
+FUNCTION get_list_of_real_codepages()
+   LOCAL s_uni := { => }
+   LOCAL cdp
+   s_uni := { => }
+   FOR EACH cdp IN hb_cdpList()
+      s_uni[ hb_cdpUniID( cdp ) ] := cdp
+   NEXT
+RETURN s_uni	
+?>
+

@@ -1,0 +1,220 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+	/*
+		Esto es un ejemplo tradicional como p.e. php en que mezclas código nativo 
+		junto a tu lenguaje back, en este caso Harbour. Usuarios avanzados
+		
+		This is a traditional example as e.g. php in which you mix native code
+		next to your back language, in this case Harbour. Advance Users
+	*/
+
+    LOCAL o, oWeb, oBrw, aOptions, hCredentials
+	LOCAL aData := pValue(4)		//	Data for browse
+	
+	if ! USessionReady()
+		URedirect( 'login' )
+		retu nil
+	endif	
+	
+	hCredentials := USession( 'credentials' )
+	
+	DEFINE WEB oWeb TITLE 'Dashboard' 
+	
+		oWeb:AddJs( 'files/chart/chart.js' )
+		oWeb:AddCss( 'https://unpkg.com/tabulator-tables@5.4.3/dist/css/tabulator_simple.min.css' )
+		
+		HTML oWeb FILE 'dbu/view/menu.html' PARAMS oWeb, 'Dashboard', hCredentials
+			
+		
+		DEFINE FORM o ID 'browse' API 'api_browse' OF oWeb 													
+
+		
+		HTML o FILE 'dbu/view/crumb.html' PARAMS o, 'Dashboard' 
+
+		INIT FORM o 
+		
+HTML o 
+	<div class="row p-3" >
+		<div class="w-100 alert alert-secondary" role="alert">
+		  <h3><b><i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;Real-time data monitoring</b></h3>
+		</div>			
+	</div>	
+
+	<div class="row">										
+	
+		<div class="col-4">
+		
+			<div class="card">
+			  <div class="card-header">
+				<b>Year 2020</b>
+			  </div>
+			  <div class="card-body">
+				<canvas id="chart1"></canvas>
+			  </div>
+			</div>								
+		
+		</div>
+		
+		<div class="col-4">
+		
+			<div class="card">
+			  <div class="card-header">
+				<b>Year 2021</b>
+			  </div>
+			  <div class="card-body">
+				<canvas id="chart2"></canvas>
+			  </div>
+			</div>								
+		
+		</div>
+
+		<div class="col-4">
+		
+			<div class="card">
+			  <div class="card-header">
+				<b>Year 2022</b>
+			  </div>
+			  <div class="card-body">
+				<canvas id="chart3"></canvas>
+			  </div>
+			</div>								
+		
+		</div>							
+
+	</div>	
+	
+	<div class="row pt-5">										
+	
+		<div class="col-6">
+		
+			<div class="card">
+			  <div class="card-header">
+				<b>Top 5 sales</b>
+			  </div>
+			  <div class="card-body ">
+				<canvas id="chart4" width="800" height="450"></canvas>
+			  </div>
+			</div>								
+		
+		</div>		
+	
+		<div class="col-6">
+ENDTEXT	
+
+			aOptions := { 'height' => '250px', 'layout' => 'fitDataStretch' }																
+
+			DEFINE BROWSE oBrw ID 'mytable' OPTIONS aOptions ;
+				TITLE '<h5><i class="fa fa-credit-card" aria-hidden="true"></i>&nbsp;Customer list</h5>' OF o
+
+				COL oCol TO oBrw CONFIG { 'title' => 'Month', 'field' => 'mes' }
+				COL oCol TO oBrw CONFIG { 'title' => 'Sales', 'field' => 'value','hozAlign' => 'center', 'headerHozAlign' => 'center' }
+				
+			INIT BROWSE oBrw DATA aData		
+				
+			HTML o INLINE '</div></div>'		
+			
+		ENDFORM o
+
+		HTML o 
+		
+			<script>
+			
+				const labels = [
+					'January',
+					'February',
+					'March',
+					'April',
+					'May',
+					'June',
+					'July',
+					'August',
+					'September',
+					'October',
+					'November',
+					'December'
+				];			
+					
+				const data1 = {
+					labels: labels,
+					datasets: [{	
+					  label: 'Sales',		
+					  backgroundColor: 'rgb(255, 99, 132)',
+					  borderColor: 'rgb(255, 99, 132)',
+					  data: {{ hb_jsonencode( pvalue(1)['2020'] ) }},
+					  tension: 0.4		  
+					}]
+				};
+		  
+		  
+				const data2 = {
+					labels: labels,
+					datasets: [{
+					  label: 'Sales',
+					  backgroundColor: 'rgb(60, 190, 242)',
+					  borderColor: 'rgb(60, 190, 242)',
+					  data: {{ hb_jsonencode( pvalue(1)['2021'] ) }},
+					  tension: 0.4
+					}]
+				};
+
+				const data3 = {
+					labels: labels,
+					datasets: [{
+					  label: 'Sales',
+					  backgroundColor: 'rgb(94,182,117)',
+					  borderColor: 'rgb(94,182,117)',
+					  data: {{ hb_jsonencode( pvalue(1)['2022'] ) }},
+					  tension: 0.4
+					}]
+				};			
+				
+				const data4 = {
+					labels: {{ hb_jsonencode( pvalue(2) ) }},
+					datasets: [
+					{
+					  label: "Top 5 Clients",
+					  backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+					  data: {{ hb_jsonencode( pvalue(3) ) }}
+					}]
+				} 			
+				
+				config1 = {
+					type: 'line',		
+					data: data1,
+					options: {			legend: {
+						  display: false
+						}}
+					};
+					  
+				const config2 = {	type: 'line', data: data2, options: {} };		  
+				const config3 = {	type: 'line', data: data3, options: {} };	
+			  
+				const config4 = {
+				  type: 'bar',
+				  data: data4,
+					options: {
+					  legend: { display: false },
+					  title: {
+						display: true,
+						text: 'Predicted world population (millions) in 2050'
+					  }
+					}
+				}				
+				
+				$(document).ready(function(){
+					
+					const myChart1 = new Chart(document.getElementById('chart1'), config1 );
+					const myChart2 = new Chart(document.getElementById('chart2'), config2 );
+					const myChart3 = new Chart(document.getElementById('chart3'), config3 );
+					
+					const myChart4 = new Chart(document.getElementById('chart4'), config4 );
+				});				
+				
+			</script>
+		
+		ENDTEXT 
+		
+	INIT WEB oWeb RETURN
+?>
+

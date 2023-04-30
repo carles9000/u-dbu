@@ -1,0 +1,150 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oWeb, oBrw, aOptions, hCredentials
+	local hCfg := {=>}
+
+	LOCAL cCss 	:= 'tabulator_simple.min.css'	//'tabulator_modern.css'
+	LOCAL oUser, aRows
+	
+	if ! USessionReady()
+		URedirect( 'login' )
+		retu nil
+	endif
+	
+	hCredentials := USession( 'credentials' )	
+	
+	oUser 	:= TDbf():New( 'users.dbf', 'users.cdx', 'user' )
+	aRows 	:= oUser:LoadAll()
+	
+	DEFINE WEB oWeb TITLE 'Users' 
+	
+		oWeb:AddCss( 'https://unpkg.com/tabulator-tables@5.4.3/dist/css/' + cCss )
+		
+		HTML oWeb FILE 'dbu/view/menu.html' PARAMS oWeb, 'Users', hCredentials
+		
+		DEFINE FORM o ID 'users' API 'api_users' OF oWeb 			
+		
+			o:cSizing  := 'sm'
+			o:lDessign := .f.
+		
+		HTML o 
+			<style>
+
+				.myscreen { 
+					/*border:1px solid red;*/
+					max-width: 600px;
+				}	
+
+			</style>
+		
+		ENDTEXT
+		
+		HTML o FILE 'dbu/view/crumb.html' PARAMS o, '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;Security - Users' 
+		
+		HTML o 
+			<style>
+
+				.mybar {				
+					border: 1px solid gray;
+					width:100%;	
+					background-color: #d8d8d8;
+					border-color: darkgray;
+					border-right-color: black;
+					border-bottom-color: black;	
+					box-shadow: 5px 5px 5px gray;					
+				}
+				
+			</style>
+		
+		ENDTEXT			
+
+		INIT FORM o 
+			
+			ROW o HALIGN 'center' CLASS 'pt-1' 									
+				
+				COL o GRID 10 CLASS 'myscreen'						
+
+					ROW o   
+						
+							aOptions := { ;
+								'index' => '_recno',   	;		// Default id
+								'height' => '300px',	;								
+								'selectable' => 1,		;	// Podem posar 1 (sols 1 col)
+								'selectableRollingSelection' => 1;
+							}															
+//								'selectableRangeMode' => "click"	;								
+							
+							aItemsTxt	:= { 'A' => 'Administrator', 'U' => 'User' } 
+							aItems 		:= { 'values' => aItemsTxt }
+							
+						//	Via API direct
+							aEvents := { { 'name' => 'cellEdited' , 'proc' => 'update'} }								
+							
+							DEFINE BROWSE oBrw ID 'brwusers' OPTIONS aOptions EVENTS aEvents ;
+								CLASS 'w-100' ;
+								TITLE '<h5><i class="fa fa-users" aria-hidden="true"></i>&nbsp;Users</h5>' OF o 								
+								
+								COL oCol TO oBrw CONFIG { 'formatter' => "rowSelection",  'align' => "center", 'headerSort' => .F., 'hozAlign' => "center" }
+								
+								COL oCol TO oBrw CONFIG { 'title' => 'User'     , 'field' => 'USER'   , 'width' => 200, 'editor' => 'input' }
+								COL oCol TO oBrw CONFIG { 'title' => 'Name'	    , 'field' => 'NAME'   , 'editor' => 'input' }
+								COL oCol TO oBrw CONFIG { 'title' => 'Profile'	, 'field' => 'PROFILE', 'editor' => 'list', 'editorParams' => aItems, 'formatter' => 'lookup', 'formatterParams' => aItemsTxt, 'hozAlign' => 'center'  }
+								COL oCol TO oBrw CONFIG { 'title' => 'Active'	, 'field' => 'ACTIVE' , 'hozAlign' => 'center', 'editor' => 'tickCross', 'formatter' => 'tickCross', 'hozAlign' => 'center'}
+								
+							INIT BROWSE oBrw DATA aRows
+			
+					ENDROW o 
+					
+					ROWGROUP o //CLASS "pl-3 pr-3"
+						
+						HTML o INLINE '<div class="mybar pt-1 pb-1">'
+							COL o GRID 12 							
+								HTML o INLINE '<div class="btn-group">' 
+									BUTTON LABEL '&nbsp;New'  ICON '<i class="fa fa-plus" aria-hidden="true"></i>' ACTION 'new' GRID 0 WIDTH '100px'  CLASS 'btn btn-outline-dark' OF o
+									BUTTON LABEL '&nbsp;Del'  ICON '<i class="fa fa-trash" aria-hidden="true"></i>' ACTION 'del' GRID 0 WIDTH '100px' CLASS 'btn btn-outline-dark' OF o
+								HTML o INLINE '</div>'
+								
+								HTML o INLINE '<div class="btn-group" style="float:right;">' 																		
+									BUTTON LABEL '&nbsp;Reset Key' ACTION 'ResetKey()' GRID 0 WIDTH '100px' CLASS 'btn btn-outline-dark'  ICON '<i class="fa fa-key" aria-hidden="true"></i>' OF o									
+								HTML o INLINE '</div>'									
+							ENDCOL o
+						HTML o INLINE '</div>'
+						
+					ENDROW o 						
+				
+				ENDCOL o	
+				
+			ENDROW o			
+
+		ENDFORM o
+		
+		HTML o 
+		
+			<script>
+			
+				//	You can use method B. Go to the Api via javascript if is necesary :-)
+			
+				function ResetKey() {	
+
+					var table = Tabulator.findTable('#users-brwusers')[0];
+					
+					if ( table.getSelectedData().length != 1 )
+						return null
+				
+					MsgGet( '', function(uValue){ 						
+					
+						var oPar = new Object()
+							oPar[ 'newkey' ] = uValue
+							
+						MsgApi( 'api_users', 'resetkey', oPar )
+						
+					}, 'Reset Key', '<i class="fa fa-unlock-alt" aria-hidden="true"></i>' ) 								
+				}
+				
+			</script>
+		
+		ENDTEXT 
+
+	INIT WEB oWeb RETURN
+?>

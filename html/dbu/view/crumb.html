@@ -1,0 +1,28 @@
+<?prg 
+
+	LOCAL o 		:= pvalue(1)
+	LOCAL cTitle 	:= pvalue(2)
+
+	HTML o 
+		<style>
+
+			.crumbs {
+				width: 100%;
+				background-color: #415762;
+				color: white;
+				padding-left: 20px;
+				font-size: 20px;					
+				font-family: Arial, Helvetica, sans-serif;
+				border-top: 1px solid white
+			}
+			
+		</style>
+	
+	ENDTEXT	
+
+	ROW o CLASS 'm-0'
+		SAY PROMPT cTitle CLASS 'crumbs' GRID 12 Of o			
+	ENDROW o 
+	
+	RETU ''
+?>

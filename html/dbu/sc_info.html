@@ -1,0 +1,54 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+	
+	local cTable 	:= pValue(1)
+	local aInfo 	:= pValue(2)
+    LOCAL o, oDlg, oBrw, aOptions, aFilter , c
+
+	DEFINE DIALOG oDlg 			
+		
+		DEFINE FORM o OF oDlg 			
+		
+		INIT FORM o 
+
+			o:cSizing := 'sm'					
+			
+			ROWGROUP o 				
+				SAY VALUE '<h5>' + cTable  + '</h5>' GRID 12 ALIGN 'center'  OF o		
+			ENDROW o
+			
+			ROWGROUP o 					
+				
+				COL o GRID 12
+				
+					//	https://tabulator.info/docs/5.4/options
+				
+					aOptions := { ;
+						'height' => '280px',				;
+						'layout' => 'fitDataStretch',		;						
+						'index' => 'file', 					;	// Default id
+						'selectable' => 1, 					;	// Podem posar 1 (sols 1 col)
+						'selectableRollingSelection' => .T. ;
+					}														
+					
+					DEFINE BROWSE oBrw ID 'brwdbf' OPTIONS aOptions ;
+						TITLE '<h5>Info</h5>' OF o 					
+						
+						//	https://tabulator.info/docs/5.4/columns 												
+						
+						COL oCol TO oBrw CONFIG { 'title' => "Description", 'field' => "tag" }
+						COL oCol TO oBrw CONFIG { 'title' => "Value", 'field' => "value"}						
+						COL oCol TO oBrw CONFIG { 'title' => "Info", 'field' => "cargo", 'hozAlign' => 'center', 'headerHozAlign' => 'center'}						
+						
+					INIT BROWSE oBrw DATA aInfo																	
+			
+				ENDCOL o				
+				
+			ENDROW o
+	
+		ENDFORM o
+ 
+	INIT DIALOG oDlg RETURN
+?>
+
