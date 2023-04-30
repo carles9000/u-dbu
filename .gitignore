@@ -1,5 +1,3 @@
-data.example/*
-!data.example/.gitkeep 
 dat.sys/*
 !data.sys/.gitkeep 
 #Ignore dirs .hbmk, .sessions,...
