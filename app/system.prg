@@ -1,7 +1,7 @@
 function CheckIni()
 
 	LOCAL cFileIni	:= HB_DIRBASE() + 'app.ini'
-	LOCAL hIni 		:= hb_iniRead( HB_DIRBASE() + 'app.ini', .F. )
+	LOCAL hIni 	:= hb_iniRead( HB_DIRBASE() + 'app.ini', .F. )
 	LOCAl hConfig 	:= {=>}
 	
 	if file( cFileIni )	
@@ -18,6 +18,10 @@ retu hConfig
 // -------------------------------------------------- //
 
 function CheckDbfs()
+
+	if !hb_DirExists( AppPathData() )
+		HB_DirBuild( AppPathData() )
+	endif 
 
 	if !file( AppPathData() + 'users.dbf' )
 		InitDbfUsers()

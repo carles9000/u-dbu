@@ -26,7 +26,7 @@ REQUEST HB_CODEPAGE_PTISO
 REQUEST hb_cdpList 
 
 #define VK_ESCAPE	27
-#define APP_VERSION 'U-Dbu v1.0a'
+#define APP_VERSION 'U-Dbu v1.0b'
 
 
 
@@ -45,7 +45,7 @@ retu nil
 
 function WebServer( hConfig )
 
-	local oServer 	:= Httpd2()
+	local oServer 		:= Httpd2()
 	local hCfg 		:= Config()
 
 	HB_HCaseMatch( hCfg, .F. )

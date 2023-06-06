@@ -16,10 +16,8 @@ class UTabulator {
 	cargo = null 			
 	
 	constructor( id ) {  // Constructor
-	
 		this.id = id;
 		this.table = Tabulator.findTable("#" + id )[0];					
-		
 	}	
 	
 

@@ -92,7 +92,6 @@ body {
 
 
 .TDlg_Msg {
-	display: block !important;
 	padding:0px !important;
 	box-shadow: 5px 5px 5px;
 	border-radius: 7px;	
