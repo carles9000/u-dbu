@@ -16,6 +16,7 @@ app\api_browse.prg
 app\api_dashboard.prg
 app\tdbf.prg
 app\system.prg
+app\security.prg
 
 
 

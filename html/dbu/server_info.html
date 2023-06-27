@@ -4,10 +4,13 @@
 	LOCAL cCss := 'tabulator_simple.min.css'	//'tabulator_modern.css'
     LOCAL o, oWeb, oBrw, aOptions, hCredentials, aData, hCfg
 	
-	if ! USessionReady()
-		URedirect( 'login' )
-		retu nil
-	endif	
+	//	Auth system...
+	
+		if ! Authorization( 'A' )
+			retu nil
+		endif
+		
+	//	-------------------------
 	
 	hCredentials := USession( 'credentials' )
 	

@@ -6,11 +6,14 @@
 
 	LOCAL cCss 	:= 'tabulator_simple.min.css'	//'tabulator_modern.css'
 	LOCAL oUser, aRows
+
+	//	Auth system...
 	
-	if ! USessionReady()
-		URedirect( 'login' )
-		retu nil
-	endif
+		if ! Authorization( 'A' )
+			retu nil
+		endif
+		
+	//	-------------------------
 	
 	hCredentials := USession( 'credentials' )	
 	
@@ -40,7 +43,7 @@
 		
 		ENDTEXT
 		
-		HTML o FILE 'dbu/view/crumb.html' PARAMS o, '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;Security - Users' 
+		HTML o FILE 'dbu/view/crumb.html' PARAMS o, '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;Security - Users.' 
 		
 		HTML o 
 			<style>

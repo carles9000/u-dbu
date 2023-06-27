@@ -26,7 +26,7 @@ REQUEST HB_CODEPAGE_PTISO
 REQUEST hb_cdpList 
 
 #define VK_ESCAPE	27
-#define APP_VERSION 'U-Dbu v1.0b'
+#define APP_VERSION 'U-Dbu v1.0c'
 
 
 

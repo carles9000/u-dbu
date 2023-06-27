@@ -7,10 +7,13 @@
 	LOCAL cCss 	:= 'tabulator_simple.min.css'	//'tabulator_modern.css'
 	LOCAL oRepo, aRows
 	
-	if ! USessionReady()
-		URedirect( 'login' )
-		retu nil
-	endif
+	//	Auth system...
+	
+		if ! Authorization( 'A' )
+			retu nil
+		endif
+		
+	//	-------------------------
 	
 	hCredentials := USession( 'credentials' )	
 	

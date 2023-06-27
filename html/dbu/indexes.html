@@ -15,10 +15,13 @@
 	LOCAL aTypesKey 	:= { 'C'        , 'N'      , 'L'    , 'D'   , 'M' }
 	LOCAL hCfg 			:= {=>}
 	
-	if ! USessionReady()
-		URedirect( 'login' )
-		retu nil
-	endif	
+	//	Auth system...
+	
+		if ! Authorization( 'A' )
+			retu nil
+		endif
+		
+	//	-------------------------	
 	
 	hCredentials := USession( 'credentials' )
 	

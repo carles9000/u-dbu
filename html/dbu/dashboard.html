@@ -12,10 +12,13 @@
     LOCAL o, oWeb, oBrw, aOptions, hCredentials
 	LOCAL aData := pValue(4)		//	Data for browse
 	
-	if ! USessionReady()
-		URedirect( 'login' )
-		retu nil
-	endif	
+	//	Auth system...
+	
+		if ! Authorization( 'A' )
+			retu nil
+		endif
+		
+	//	-------------------------
 	
 	hCredentials := USession( 'credentials' )
 	
